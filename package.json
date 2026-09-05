@@ -1,0 +1,25 @@
+{
+  "name": "x402-mcp-starter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "check": "tsc --noEmit",
+    "cf-typegen": "wrangler types ./worker-configuration.d.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.0.0",
+    "@x402/core": "^2.23.0",
+    "@x402/evm": "^2.23.0",
+    "agents": "^0.21.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260905.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11",
+    "wrangler": "^4.125.0"
+  }
+}

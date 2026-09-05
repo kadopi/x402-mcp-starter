@@ -1,0 +1,3 @@
+# Never commit a real receiving wallet you do not intend to publish.
+X402_PAY_TO=0x0000000000000000000000000000000000000000
+# Base Sepolia defaults are declared in wrangler.jsonc.
