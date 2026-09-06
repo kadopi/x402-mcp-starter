@@ -1,3 +1,6 @@
-# Never commit a real receiving wallet you do not intend to publish.
+X402_NETWORK=eip155:84532
+X402_ASSET=0x036CbD53842c5426634e7929541eC2318f3dCF7e
+X402_AMOUNT=10000
+X402_PRICE_USD=0.01
+X402_FACILITATOR_URL=https://x402.org/facilitator
 X402_PAY_TO=0x0000000000000000000000000000000000000000
-# Base Sepolia defaults are declared in wrangler.jsonc.

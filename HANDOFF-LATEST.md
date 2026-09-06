@@ -1,7 +1,7 @@
 # 最新引き継ぎ 2026-09-06
 
 - 現在地: Cloudflare Testnet D1とWorkerを作成・デプロイ済み。Testnet実決済1回が成功。
-- 直近コミット: `5c53c51 feat: add testnet x402 payment runner`（private `kadopi/x402-mcp-starter`へpush済み）。
+- 直近コミット: `49554c2 docs: clarify generic starter scope`（private `kadopi/x402-mcp-starter`へpush済み）。
 - 実装: Cloudflare Workersの`/mcp` Streamable HTTP、無料`list_rule_topics`、有料`get_rule_brief`。
 - 決済SDK: 公式`@x402/core`/`@x402/evm` Exact EVMサーバーAPIを薄く利用。
 - 初期設定: Base Sepolia `eip155:84532`、テストUSDC、0.01 USDC（10000 atomic）。
@@ -22,5 +22,6 @@
 - 購入者: `npm run payer:testnet:create`で専用EOAを作成。秘密鍵はGit無視の`.testnet-payer.env`だけに保存し、Worker・チャットへ渡さない。
 - 安全境界: 購入者秘密鍵はWorkerに設定しない。サンプルtoolは読み取り専用の静的結果。
 - 関連ファイル: `src/index.ts`, `src/config.ts`, `src/ledger.ts`, `migrations/0001_purchases.sql`, `README.md`。
-- 次の最小作業: このリポジトリは汎用x402 MCP決済スターターとして維持する。実データ・商品設計はJapan Ruleなど別サービス側で接続する。Mainnet移行は別承認。
+- 現在のローカル変更: 汎用サンプル名、再送の保存済み購入優先、期限切れ結果拒否、配布用D1・受取先プレースホルダー、MITライセンスを追加。
+- 次の最小作業: 配布用変更をcommit/pushし、Testnet用設定を別に復元して再送を1回確認する。Mainnet移行は別承認。
 - 注意: Mainnet設定は対応するが、本番検証済みではない。

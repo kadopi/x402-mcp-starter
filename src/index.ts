@@ -23,29 +23,31 @@ export function createServer(env: Env): McpServer {
   let initialized: Promise<void> | undefined;
   const initialize = () => initialized ??= resourceServer.initialize();
 
-  server.registerTool("list_rule_topics", {
-    title: "List sample Japan Rule topics",
+  server.registerTool("list_sample_options", {
+    title: "List free sample options",
     description: "Free sample: returns a small static catalog without payment.",
     inputSchema: z.object({}),
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-  }, async () => result({ free: true, topics: ["consumer-protection", "employment", "privacy"] }));
+  }, async () => result({ free: true, options: ["basic", "standard", "extended"] }));
 
-  server.registerTool("get_rule_brief", {
-    title: "Get a paid sample rule brief",
-    description: "Paid sample: returns a static Japan Rule-style brief after an x402 USDC payment.",
-    inputSchema: z.object({ topic: z.enum(["consumer-protection", "employment", "privacy"]) }),
+  server.registerTool("get_paid_sample", {
+    title: "Get a paid sample result",
+    description: "Paid sample: returns static data after an x402 USDC payment.",
+    inputSchema: z.object({ option: z.enum(["basic", "standard", "extended"]) }),
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-  }, async (args, extra) => paidRuleBrief(args, extra, env, config, resourceServer, initialize));
+  }, async (args, extra) => paidSample(args, extra, env, config, resourceServer, initialize));
   return server;
 }
 
-async function paidRuleBrief(args: { topic: string }, extra: any, env: Env, config: ReturnType<typeof paymentConfig>, resourceServer: any, initialize: () => Promise<void>) {
+async function paidSample(args: { option: string }, extra: any, env: Env, config: ReturnType<typeof paymentConfig>, resourceServer: any, initialize: () => Promise<void>) {
   await initialize();
   const requirements = await resourceServer.buildPaymentRequirements({ scheme: "exact", payTo: config.recipient, price: config.priceUsd, network: config.network, maxTimeoutSeconds: 300 });
   const token = extra?.mcpReq?._meta?.["x402/payment"] ?? extra?._meta?.["x402/payment"] ?? extra?.requestInfo?.headers?.["PAYMENT-SIGNATURE"];
   if (typeof token !== "string") return paymentRequired(requirements);
   const fingerprint = await sha256(token);
   const inputHash = await sha256(canonicalJson(args));
+  const existing = await getPurchase(env.DB, fingerprint);
+  if (existing) return existingPurchase(existing, inputHash, "get_paid_sample", config);
   let payload: unknown;
   try { payload = JSON.parse(atob(token)); } catch { return paymentRequired(requirements, "INVALID_PAYMENT"); }
   const matching = resourceServer.findMatchingRequirements(requirements, payload);
@@ -56,16 +58,16 @@ async function paidRuleBrief(args: { topic: string }, extra: any, env: Env, conf
   const now = new Date();
   const claimed = await claimPurchase(env.DB, {
     purchase_id: crypto.randomUUID(), payment_fingerprint: fingerprint, payer: verification.payer ?? null,
-    tool_name: "get_rule_brief", input_hash: inputHash, network: config.network, asset: config.asset, amount: config.amount,
+    tool_name: "get_paid_sample", input_hash: inputHash, network: config.network, asset: config.asset, amount: config.amount,
     created_at: now.toISOString(), updated_at: now.toISOString(), expires_at: new Date(now.getTime() + RESULT_TTL_DAYS * 86_400_000).toISOString(),
   });
-  if (!claimed.created) return existingPurchase(claimed.purchase, inputHash, "get_rule_brief");
+  if (!claimed.created) return existingPurchase(claimed.purchase, inputHash, "get_paid_sample", config);
   let settlement: any;
   try { settlement = await resourceServer.settlePayment(payload, matching); } catch { return pendingReceipt(claimed.purchase.purchase_id); }
   if (!settlement.success) return paymentRequired(requirements, settlement.errorReason ?? "SETTLEMENT_FAILED");
   const receipt = { purchaseId: claimed.purchase.purchase_id, status: "settled", transaction: settlement.transaction, network: settlement.network, payer: settlement.payer };
   try {
-    const body = { topic: args.topic, summary: `Sample ${args.topic} brief. Replace this handler with your read-only data source.`, receipt };
+    const body = { option: args.option, summary: `Paid sample result for ${args.option}. Replace this handler with your own read-only data source.`, receipt };
     await saveSettled(env.DB, fingerprint, String(settlement.transaction ?? ""), body);
     return result(body, { "x402/payment-response": receipt });
   } catch {
@@ -74,13 +76,14 @@ async function paidRuleBrief(args: { topic: string }, extra: any, env: Env, conf
   }
 }
 
-function existingPurchase(purchase: Purchase, inputHash: string, toolName: string) {
-  if (purchase.input_hash !== inputHash || purchase.tool_name !== toolName) return error("payment_reuse_rejected", "This payment proof belongs to a different tool call.");
+function existingPurchase(purchase: Purchase, inputHash: string, toolName: string, config: ReturnType<typeof paymentConfig>) {
+  if (purchase.input_hash !== inputHash || purchase.tool_name !== toolName || purchase.network !== config.network || purchase.asset.toLowerCase() !== config.asset.toLowerCase() || purchase.amount !== config.amount) return error("payment_reuse_rejected", "This payment proof belongs to a different tool call or price.");
+  if (new Date(purchase.expires_at).getTime() <= Date.now()) return error("purchase_expired", "The saved result has expired. Do not reuse this payment proof.");
   if (purchase.status === "settled" && purchase.result_json) return result(JSON.parse(purchase.result_json));
   if (purchase.status === "delivery_failed") return error("delivery_failed", "Payment was settled but delivery failed. Use the same proof when retrying.", { purchaseId: purchase.purchase_id, transaction: purchase.transaction_ref });
   return pendingReceipt(purchase.purchase_id);
 }
-function paymentRequired(accepts: unknown, reason = "PAYMENT_REQUIRED") { return { isError: true, _meta: { "x402/error": { x402Version: 2, error: reason, resource: { url: "x402://get_rule_brief", description: "Get a paid sample rule brief", mimeType: "application/json" }, accepts } }, content: [{ type: "text" as const, text: JSON.stringify({ error: reason, accepts }) }] }; }
+function paymentRequired(accepts: unknown, reason = "PAYMENT_REQUIRED") { return { isError: true, _meta: { "x402/error": { x402Version: 2, error: reason, resource: { url: "x402://get_paid_sample", description: "Get a paid sample result", mimeType: "application/json" }, accepts } }, content: [{ type: "text" as const, text: JSON.stringify({ error: reason, accepts }) }] }; }
 function pendingReceipt(purchaseId: string) { return error("payment_confirmation_pending", "Settlement outcome is unknown. Retry only with the same payment proof; do not create a new payment.", { purchaseId }); }
 function result(value: unknown, meta?: Record<string, unknown>) { return { content: [{ type: "text" as const, text: JSON.stringify(value) }], structuredContent: value as Record<string, unknown>, ...(meta ? { _meta: meta } : {}) }; }
 function error(code: string, message: string, details?: unknown) { const value = { error: code, message, ...(details && typeof details === "object" ? details : {}) }; return { isError: true, content: [{ type: "text" as const, text: JSON.stringify(value) }], structuredContent: value }; }

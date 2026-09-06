@@ -4,8 +4,8 @@ Free, self-hosted Cloudflare Workers starter for an MCP server with one free too
 
 ## Included flow
 
-- `list_rule_topics`: free Japan Rule-style sample catalog.
-- `get_rule_brief`: fixed-price paid sample, guarded by the official `@x402/core` and `@x402/evm` Exact EVM server APIs.
+- `list_sample_options`: free sample catalog.
+- `get_paid_sample`: fixed-price paid sample, guarded by the official `@x402/core` and `@x402/evm` Exact EVM server APIs.
 - An unpaid paid-tool call returns a canonical MCP x402 error containing payment requirements. An x402-aware client signs, retries with `x402/payment`, and receives a tool result with `x402/payment-response`.
 - A D1 purchase row binds a SHA-256 fingerprint of the payment proof to the tool name and canonical input hash. Reusing it for other input is rejected. Retrying the same call returns its saved result; a `settling` record returns `payment_confirmation_pending`, never a fresh charge request.
 - Successful results are retained for 7 days. The database never stores a private key or raw payment proof.
@@ -23,14 +23,14 @@ The buyer's private key belongs only in its payment client. It is never configur
 ```sh
 npm install
 npx wrangler d1 create x402-mcp-starter
-# Put the returned database_id in wrangler.jsonc; this is an edit only, not a deploy.
+# Set your Worker name, database_id, and receiving address in wrangler.jsonc.
 npx wrangler d1 execute x402-mcp-starter --local --file migrations/0001_purchases.sql
 cp .dev.vars.example .dev.vars
 # Set X402_PAY_TO in .dev.vars to a valid public test wallet address.
 npm run dev
 ```
 
-Connect an MCP client to `http://localhost:8788/mcp`. `list_rule_topics` works without payment. An unpaid `get_rule_brief` returns the payment challenge. The default price is 10,000 atomic USDC units (`0.01` USDC) on `eip155:84532`; `X402_AMOUNT` must match `X402_PRICE_USD × 1,000,000`.
+Connect an MCP client to `http://localhost:8788/mcp`. `list_sample_options` works without payment. An unpaid `get_paid_sample` returns the payment challenge. The default price is 10,000 atomic USDC units (`0.01` USDC) on `eip155:84532`; `X402_AMOUNT` must match `X402_PRICE_USD × 1,000,000`.
 
 ## Testnet confirmation checklist
 
@@ -52,7 +52,7 @@ set -a; source .testnet-payer.env; set +a; npm run e2e:testnet
 
 It accepts only one exact Base Sepolia USDC requirement for 10,000 atomic units, addressed to the configured recipient. Do not paste a private key into chat or commit it to `.dev.vars`.
 
-No testnet USDC transfer, D1 creation, deployment, npm publish, or public release is performed by this repository. Base Mainnet is configuration-capable (`eip155:8453` and canonical USDC) but is not production-verified.
+This package does not automatically create a D1 database, deploy a Worker, or make a payment. Base Mainnet is configuration-capable (`eip155:8453` and canonical USDC) but is not production-verified.
 
 ## Operations limits
 

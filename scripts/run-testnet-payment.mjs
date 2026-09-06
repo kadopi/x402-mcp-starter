@@ -26,7 +26,7 @@ try {
     item.scheme === expected.scheme && item.network === expected.network &&
     String(item.asset).toLowerCase() === expected.asset.toLowerCase() &&
     String(item.amount) === expected.amount && String(item.payTo).toLowerCase() === expected.payTo.toLowerCase(),
-  ), { name: "get_rule_brief", arguments: { topic: "privacy" } });
+  ), { name: "get_paid_sample", arguments: { option: "basic" } });
   const body = result.structuredContent;
   const receipt = body?.receipt ?? result._meta?.["x402/payment-response"];
   if (result.isError || !receipt || typeof receipt.purchaseId !== "string") throw new Error("testnet_payment_failed");
