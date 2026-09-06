@@ -22,5 +22,5 @@
 - 購入者: `npm run payer:testnet:create`で専用EOAを作成。秘密鍵はGit無視の`.testnet-payer.env`だけに保存し、Worker・チャットへ渡さない。
 - 安全境界: 購入者秘密鍵はWorkerに設定しない。サンプルtoolは読み取り専用の静的結果。
 - 関連ファイル: `src/index.ts`, `src/config.ts`, `src/ledger.ts`, `migrations/0001_purchases.sql`, `README.md`。
-- 次の最小作業: 売る有料コンテンツを1つ決め、そのデータ取得を有料toolへ接続。Mainnet移行は別承認。
+- 次の最小作業: このリポジトリは汎用x402 MCP決済スターターとして維持する。実データ・商品設計はJapan Ruleなど別サービス側で接続する。Mainnet移行は別承認。
 - 注意: Mainnet設定は対応するが、本番検証済みではない。
