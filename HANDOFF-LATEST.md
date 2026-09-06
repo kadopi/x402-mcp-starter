@@ -1,7 +1,7 @@
 # 最新引き継ぎ 2026-09-06
 
-- 現在地: Cloudflare Testnet D1とWorkerを作成・デプロイ済み。Testnet実決済1回が成功。
-- 直近コミット: `d6d98ce feat: prepare generic starter release`（private `kadopi/x402-mcp-starter`へpush済み）。
+- 現在地: Cloudflare Testnet D1とWorkerを作成・デプロイ済み。汎用アダプターでTestnet実決済・同一証明再送が成功。
+- 直近コミット: `dfb18e0 feat: extract reusable paid tool adapter`（private `kadopi/x402-mcp-starter`へpush済み）。
 - 実装: Cloudflare Workersの`/mcp` Streamable HTTP、無料`list_sample_options`、有料`get_paid_sample`。
 - 決済SDK: 公式`@x402/core`/`@x402/evm` Exact EVMサーバーAPIを薄く利用。
 - 初期設定: Base Sepolia `eip155:84532`、テストUSDC、0.01 USDC（10000 atomic）。
@@ -13,15 +13,16 @@
 - 結果保存: 7日。秘密鍵・生の支払い証明は保存・ログ出力しない。
 - 確認済み: local D1 migration、MCP initialize、tools/list、無料tool、有料toolの未払いx402要求、無効証明の`INVALID_PAYMENT`。
 - 確認済み: Remote D1 `x402-mcp-starter-testnet`（APAC、ID=`f74f24a1-d2fc-4f6a-bcfb-099c3d7aec69`）へmigration適用済み。
-- 確認済み: Worker `x402-mcp-starter`をデプロイ済み。URL=`https://x402-mcp-starter.kadopi.workers.dev/mcp`、version=`d3cc0bef-8c96-465c-a4be-1c8dc01d08f0`。
+- 確認済み: Worker `x402-mcp-starter`をデプロイ済み。URL=`https://x402-mcp-starter.kadopi.workers.dev/mcp`、version=`bf6aa1bf-614c-45ee-8aa9-f46027fae98f`。
 - 確認済み: 公開URLでinitialize・無料tool・未払い`PAYMENT_REQUIRED`を確認。Base Sepolia USDC 10000 atomic、payTo=`0x6171D238FD82c293a39cEd6DF72A330532D00d76`。
 - 確認済み: 2026-09-06に購入者`0xB288...b0103`から0.01 test USDCを1回決済。D1 purchase=`dde7a94d-a15a-4aee-87ef-4f33d49a42be`は`settled`、tx=`0xf0e0...9bb79a`。
+- 確認済み: 最新の`get_paid_sample`で0.01 test USDCを1回決済し、同一証明の再送も成功。purchase=`e4b434e6-870c-4e03-8966-4d3805f15b5d`、tx=`0xcc3e...07ae`、追加決済なし。
 - 確認済み: `npm run check` 成功。`npm test` は6件成功。
-- 未確認: 同じ支払い証明による再送結果、delivery failure時の復旧、汎用名に変更した最新WorkerのTestnet往復。
+- 未確認: delivery failure時の復旧。初版公開前の必須確認ではなく、将来の障害対応改善候補。
 - 未実施: npm公開、本番用の有料コンテンツ・Mainnet移行。
 - 購入者: `npm run payer:testnet:create`で専用EOAを作成。秘密鍵はGit無視の`.testnet-payer.env`だけに保存し、Worker・チャットへ渡さない。
 - 安全境界: 購入者秘密鍵はWorkerに設定しない。サンプルtoolは読み取り専用の静的結果。
 - 関連ファイル: `src/index.ts`, `src/config.ts`, `src/ledger.ts`, `migrations/0001_purchases.sql`, `README.md`。
-- 現在のローカル変更: 汎用の`createPaidToolHandler`へ決済処理を分離し、再送状態の最小テスト、READMEの新規設定手順、同一証明を実際に再送する汎用E2E設定を追加。型・テスト確認済み。
-- 次の最小作業: ローカル変更の型・テスト確認後にcommit/pushし、Testnet用設定を別に復元して最新Workerの再送を1回確認する。Mainnet移行は別承認。
+- 現在のローカル変更: なし。`wrangler.testnet.jsonc`だけはGit無視のTestnet専用設定として存在。
+- 次の最小作業: GitHubリポジトリをpublic化し、無料セルフホスト版として公開する。Mainnet移行・npm公開は別承認。
 - 注意: Mainnet設定は対応するが、本番検証済みではない。
