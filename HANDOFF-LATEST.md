@@ -1,7 +1,7 @@
-# 最新引き継ぎ 2026-09-05
+# 最新引き継ぎ 2026-09-06
 
-- 現在地: ローカルWorker＋D1のMCP結合確認まで完了。Testnet実決済は未実施。
-- 直近コミット: `b2dc5a4 feat: add x402 MCP starter`（private `kadopi/x402-mcp-starter`へpush済み）。
+- 現在地: Cloudflare Testnet D1とWorkerを作成・デプロイ済み。Testnet実決済1回が成功。
+- 直近コミット: `a0c689e fix: read x402 payment metadata from MCP request`（private `kadopi/x402-mcp-starter`へpush済み）。
 - 実装: Cloudflare Workersの`/mcp` Streamable HTTP、無料`list_rule_topics`、有料`get_rule_brief`。
 - 決済SDK: 公式`@x402/core`/`@x402/evm` Exact EVMサーバーAPIを薄く利用。
 - 初期設定: Base Sepolia `eip155:84532`、テストUSDC、0.01 USDC（10000 atomic）。
@@ -12,10 +12,15 @@
 - 処理失敗: settlement後の保存・実行失敗は`delivery_failed`としてreceipt参照を残す。
 - 結果保存: 7日。秘密鍵・生の支払い証明は保存・ログ出力しない。
 - 確認済み: local D1 migration、MCP initialize、tools/list、無料tool、有料toolの未払いx402要求、無効証明の`INVALID_PAYMENT`。
+- 確認済み: Remote D1 `x402-mcp-starter-testnet`（APAC、ID=`f74f24a1-d2fc-4f6a-bcfb-099c3d7aec69`）へmigration適用済み。
+- 確認済み: Worker `x402-mcp-starter`をデプロイ済み。URL=`https://x402-mcp-starter.kadopi.workers.dev/mcp`、version=`d3cc0bef-8c96-465c-a4be-1c8dc01d08f0`。
+- 確認済み: 公開URLでinitialize・無料tool・未払い`PAYMENT_REQUIRED`を確認。Base Sepolia USDC 10000 atomic、payTo=`0x6171D238FD82c293a39cEd6DF72A330532D00d76`。
+- 確認済み: 2026-09-06に購入者`0xB288...b0103`から0.01 test USDCを1回決済。D1 purchase=`dde7a94d-a15a-4aee-87ef-4f33d49a42be`は`settled`、tx=`0xf0e0...9bb79a`。
 - 確認済み: `npm run check` 成功。`npm test` は3件成功。
-- 未確認: 有効な支払い証明でのD1保存/再送、実facilitator verify/settle、Testnet USDCの1往復。
-- 未実施: Cloudflare D1作成、Cloudflare deploy、実USDC決済、npm公開。今回のローカル修正は未コミット。
+- 未確認: 同じ支払い証明による再送結果、delivery failure時の復旧。
+- 未実施: npm公開。Testnet設定・buyer script・引き継ぎ更新は未コミット。
+- 購入者: `npm run payer:testnet:create`で専用EOAを作成。秘密鍵はGit無視の`.testnet-payer.env`だけに保存し、Worker・チャットへ渡さない。
 - 安全境界: 購入者秘密鍵はWorkerに設定しない。サンプルtoolは読み取り専用の静的結果。
 - 関連ファイル: `src/index.ts`, `src/config.ts`, `src/ledger.ts`, `migrations/0001_purchases.sql`, `README.md`。
-- 次の最小作業: 承認後、指定Testnet D1へmigration→指定Workerへdeploy→受取先を確認した1回だけのTestnet支払いを往復確認。その後、今回の修正をcommit/push。
+- 次の最小作業: `npm run check && npm test`後、設定・buyer script・引き継ぎをcommit/push。再送試験やMainnetは別承認。
 - 注意: Mainnet設定は対応するが、本番検証済みではない。

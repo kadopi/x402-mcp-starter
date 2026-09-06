@@ -1,4 +1,5 @@
 node_modules/
 .wrangler/
 .dev.vars
+.testnet-payer.env
 worker-configuration.d.ts

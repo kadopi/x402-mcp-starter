@@ -36,11 +36,21 @@ Connect an MCP client to `http://localhost:8788/mcp`. `list_rule_topics` works w
 
 1. Create a D1 database and apply `migrations/0001_purchases.sql` locally or to a specifically chosen non-production D1 database.
 2. Configure a Base Sepolia recipient and the facilitator URL. Keep `X402_NETWORK=eip155:84532` and the Base Sepolia USDC address.
-3. Fund only the buyer test wallet with Base Sepolia ETH and test USDC (for example, Circle's test faucet).
+3. Fund only the buyer test wallet with Base Sepolia test USDC (for example, Circle's test faucet). The EIP-3009 USDC flow is gasless for the buyer.
 4. Call the free tool, then call the paid tool without proof and confirm `x402/error` / `PAYMENT_REQUIRED`.
 5. Use an x402-capable MCP client with a hard per-payment limit of 10,000 atomic units. Confirm its payment requirements: `exact`, `eip155:84532`, expected USDC asset, recipient, and amount.
 6. Retry once with the returned payment proof; confirm the result and `x402/payment-response` receipt. Retry the same proof and input; confirm the saved result, not another settlement. Retry the proof with another topic; confirm `payment_reuse_rejected`.
 7. For a deliberate worker/network interruption after verification, retry only the same proof and confirm `payment_confirmation_pending` or the saved receipt. Inspect the D1 row before any manual reconciliation.
+
+The included buyer example runs from a normal terminal only; it reads `EVM_PRIVATE_KEY` from that terminal environment and never sends it to the Worker. Create a separate disposable Base Sepolia payer locally (it writes the secret only to ignored `.testnet-payer.env`):
+
+```sh
+npm run payer:testnet:create
+# Fund the displayed address with Base Sepolia test USDC.
+set -a; source .testnet-payer.env; set +a; npm run e2e:testnet
+```
+
+It accepts only one exact Base Sepolia USDC requirement for 10,000 atomic units, addressed to the configured recipient. Do not paste a private key into chat or commit it to `.dev.vars`.
 
 No testnet USDC transfer, D1 creation, deployment, npm publish, or public release is performed by this repository. Base Mainnet is configuration-capable (`eip155:8453` and canonical USDC) but is not production-verified.
 

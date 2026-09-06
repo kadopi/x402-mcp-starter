@@ -7,6 +7,8 @@
     "dev": "wrangler dev",
     "check": "tsc --noEmit",
     "cf-typegen": "wrangler types ./worker-configuration.d.ts",
+    "payer:testnet:create": "node scripts/create-testnet-payer.mjs",
+    "e2e:testnet": "node scripts/run-testnet-payment.mjs",
     "test": "vitest run"
   },
   "dependencies": {
@@ -18,8 +20,10 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260905.1",
+    "@modelcontextprotocol/client": "^2.0.0",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11",
+    "viem": "^2.55.19",
     "wrangler": "^4.125.0"
   }
 }
