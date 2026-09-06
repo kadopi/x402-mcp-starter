@@ -1,7 +1,7 @@
 # 最新引き継ぎ 2026-09-06
 
 - 現在地: Cloudflare Testnet D1とWorkerを作成・デプロイ済み。Testnet実決済1回が成功。
-- 直近コミット: `a0c689e fix: read x402 payment metadata from MCP request`（private `kadopi/x402-mcp-starter`へpush済み）。
+- 直近コミット: `5c53c51 feat: add testnet x402 payment runner`（private `kadopi/x402-mcp-starter`へpush済み）。
 - 実装: Cloudflare Workersの`/mcp` Streamable HTTP、無料`list_rule_topics`、有料`get_rule_brief`。
 - 決済SDK: 公式`@x402/core`/`@x402/evm` Exact EVMサーバーAPIを薄く利用。
 - 初期設定: Base Sepolia `eip155:84532`、テストUSDC、0.01 USDC（10000 atomic）。
@@ -18,9 +18,9 @@
 - 確認済み: 2026-09-06に購入者`0xB288...b0103`から0.01 test USDCを1回決済。D1 purchase=`dde7a94d-a15a-4aee-87ef-4f33d49a42be`は`settled`、tx=`0xf0e0...9bb79a`。
 - 確認済み: `npm run check` 成功。`npm test` は3件成功。
 - 未確認: 同じ支払い証明による再送結果、delivery failure時の復旧。
-- 未実施: npm公開。Testnet設定・buyer script・引き継ぎ更新は未コミット。
+- 未実施: npm公開、本番用の有料コンテンツ・Mainnet移行。
 - 購入者: `npm run payer:testnet:create`で専用EOAを作成。秘密鍵はGit無視の`.testnet-payer.env`だけに保存し、Worker・チャットへ渡さない。
 - 安全境界: 購入者秘密鍵はWorkerに設定しない。サンプルtoolは読み取り専用の静的結果。
 - 関連ファイル: `src/index.ts`, `src/config.ts`, `src/ledger.ts`, `migrations/0001_purchases.sql`, `README.md`。
-- 次の最小作業: `npm run check && npm test`後、設定・buyer script・引き継ぎをcommit/push。再送試験やMainnetは別承認。
+- 次の最小作業: 売る有料コンテンツを1つ決め、そのデータ取得を有料toolへ接続。Mainnet移行は別承認。
 - 注意: Mainnet設定は対応するが、本番検証済みではない。
