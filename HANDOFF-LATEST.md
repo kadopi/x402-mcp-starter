@@ -1,8 +1,8 @@
 # 最新引き継ぎ 2026-09-06
 
 - 現在地: Cloudflare Testnet D1とWorkerを作成・デプロイ済み。Testnet実決済1回が成功。
-- 直近コミット: `49554c2 docs: clarify generic starter scope`（private `kadopi/x402-mcp-starter`へpush済み）。
-- 実装: Cloudflare Workersの`/mcp` Streamable HTTP、無料`list_rule_topics`、有料`get_rule_brief`。
+- 直近コミット: `d6d98ce feat: prepare generic starter release`（private `kadopi/x402-mcp-starter`へpush済み）。
+- 実装: Cloudflare Workersの`/mcp` Streamable HTTP、無料`list_sample_options`、有料`get_paid_sample`。
 - 決済SDK: 公式`@x402/core`/`@x402/evm` Exact EVMサーバーAPIを薄く利用。
 - 初期設定: Base Sepolia `eip155:84532`、テストUSDC、0.01 USDC（10000 atomic）。
 - 設定検証: network/USDC asset/価格と最小単位/受取先/facilitator URLが不一致ならfail closed。
@@ -16,12 +16,12 @@
 - 確認済み: Worker `x402-mcp-starter`をデプロイ済み。URL=`https://x402-mcp-starter.kadopi.workers.dev/mcp`、version=`d3cc0bef-8c96-465c-a4be-1c8dc01d08f0`。
 - 確認済み: 公開URLでinitialize・無料tool・未払い`PAYMENT_REQUIRED`を確認。Base Sepolia USDC 10000 atomic、payTo=`0x6171D238FD82c293a39cEd6DF72A330532D00d76`。
 - 確認済み: 2026-09-06に購入者`0xB288...b0103`から0.01 test USDCを1回決済。D1 purchase=`dde7a94d-a15a-4aee-87ef-4f33d49a42be`は`settled`、tx=`0xf0e0...9bb79a`。
-- 確認済み: `npm run check` 成功。`npm test` は3件成功。
-- 未確認: 同じ支払い証明による再送結果、delivery failure時の復旧。
+- 確認済み: `npm run check` 成功。`npm test` は6件成功。
+- 未確認: 同じ支払い証明による再送結果、delivery failure時の復旧、汎用名に変更した最新WorkerのTestnet往復。
 - 未実施: npm公開、本番用の有料コンテンツ・Mainnet移行。
 - 購入者: `npm run payer:testnet:create`で専用EOAを作成。秘密鍵はGit無視の`.testnet-payer.env`だけに保存し、Worker・チャットへ渡さない。
 - 安全境界: 購入者秘密鍵はWorkerに設定しない。サンプルtoolは読み取り専用の静的結果。
 - 関連ファイル: `src/index.ts`, `src/config.ts`, `src/ledger.ts`, `migrations/0001_purchases.sql`, `README.md`。
-- 現在のローカル変更: 汎用サンプル名、再送の保存済み購入優先、期限切れ結果拒否、配布用D1・受取先プレースホルダー、MITライセンスを追加。
-- 次の最小作業: 配布用変更をcommit/pushし、Testnet用設定を別に復元して再送を1回確認する。Mainnet移行は別承認。
+- 現在のローカル変更: 汎用の`createPaidToolHandler`へ決済処理を分離し、再送状態の最小テスト、READMEの新規設定手順、同一証明を実際に再送する汎用E2E設定を追加。型・テスト確認済み。
+- 次の最小作業: ローカル変更の型・テスト確認後にcommit/pushし、Testnet用設定を別に復元して最新Workerの再送を1回確認する。Mainnet移行は別承認。
 - 注意: Mainnet設定は対応するが、本番検証済みではない。

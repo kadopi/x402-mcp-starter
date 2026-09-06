@@ -22,9 +22,10 @@ The buyer's private key belongs only in its payment client. It is never configur
 
 ```sh
 npm install
-npx wrangler d1 create x402-mcp-starter
-# Set your Worker name, database_id, and receiving address in wrangler.jsonc.
-npx wrangler d1 execute x402-mcp-starter --local --file migrations/0001_purchases.sql
+# Choose names, then create your D1 database.
+npx wrangler d1 create your-x402-purchases
+# Replace all placeholders in wrangler.jsonc: Worker name, D1 name/ID, and receiving address.
+npx wrangler d1 execute your-x402-purchases --local --file migrations/0001_purchases.sql
 cp .dev.vars.example .dev.vars
 # Set X402_PAY_TO in .dev.vars to a valid public test wallet address.
 npm run dev
@@ -39,14 +40,16 @@ Connect an MCP client to `http://localhost:8788/mcp`. `list_sample_options` work
 3. Fund only the buyer test wallet with Base Sepolia test USDC (for example, Circle's test faucet). The EIP-3009 USDC flow is gasless for the buyer.
 4. Call the free tool, then call the paid tool without proof and confirm `x402/error` / `PAYMENT_REQUIRED`.
 5. Use an x402-capable MCP client with a hard per-payment limit of 10,000 atomic units. Confirm its payment requirements: `exact`, `eip155:84532`, expected USDC asset, recipient, and amount.
-6. Retry once with the returned payment proof; confirm the result and `x402/payment-response` receipt. Retry the same proof and input; confirm the saved result, not another settlement. Retry the proof with another topic; confirm `payment_reuse_rejected`.
+6. Retry once with the returned payment proof; confirm the result and `x402/payment-response` receipt. Retry the same proof and input; confirm the saved result, not another settlement. Retry the proof with another option; confirm `payment_reuse_rejected`.
 7. For a deliberate worker/network interruption after verification, retry only the same proof and confirm `payment_confirmation_pending` or the saved receipt. Inspect the D1 row before any manual reconciliation.
 
 The included buyer example runs from a normal terminal only; it reads `EVM_PRIVATE_KEY` from that terminal environment and never sends it to the Worker. Create a separate disposable Base Sepolia payer locally (it writes the secret only to ignored `.testnet-payer.env`):
 
 ```sh
 npm run payer:testnet:create
-# Fund the displayed address with Base Sepolia test USDC.
+# Fund the displayed address with Base Sepolia test USDC, then set the endpoint and recipient you configured.
+export X402_E2E_URL=https://your-worker.your-subdomain.workers.dev/mcp
+export X402_E2E_PAY_TO=0x0000000000000000000000000000000000000000
 set -a; source .testnet-payer.env; set +a; npm run e2e:testnet
 ```
 
@@ -58,7 +61,7 @@ This package does not automatically create a D1 database, deploy a Worker, or ma
 
 - Tool handlers must remain read-only in this starter. Do not use this flow for irreversible external updates without designing a separate authorization and recovery model.
 - Settlement and delivery errors are distinct: `delivery_failed` includes the receipt reference when settlement succeeded; invalid or rejected proofs do not return a paid result.
-- The sample returns static data. Replace only the `body` in `paidRuleBrief` with your own read-only data retrieval after retaining the ledger checks.
+- `createPaidToolHandler` in `src/paid-tool.ts` is the reusable payment adapter. Supply a tool name, resource metadata, and a read-only `execute` handler; keep the ledger and retry checks intact.
 
 ## Japanese quick start
 

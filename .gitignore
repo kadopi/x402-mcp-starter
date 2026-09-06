@@ -2,4 +2,5 @@ node_modules/
 .wrangler/
 .dev.vars
 .testnet-payer.env
+wrangler.testnet.jsonc
 worker-configuration.d.ts
