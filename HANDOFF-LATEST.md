@@ -1,6 +1,6 @@
 # 最新引き継ぎ 2026-09-06
 
-- 現在地: Cloudflare Testnet D1とWorkerを作成・デプロイ済み。汎用アダプターでTestnet実決済・同一証明再送が成功。
+- 現在地: 無料セルフホスト版をGitHubでpublic公開済み。Cloudflare Testnetで実決済・同一証明再送も成功。
 - 直近コミット: `dfb18e0 feat: extract reusable paid tool adapter`（private `kadopi/x402-mcp-starter`へpush済み）。
 - 実装: Cloudflare Workersの`/mcp` Streamable HTTP、無料`list_sample_options`、有料`get_paid_sample`。
 - 決済SDK: 公式`@x402/core`/`@x402/evm` Exact EVMサーバーAPIを薄く利用。
@@ -24,5 +24,5 @@
 - 安全境界: 購入者秘密鍵はWorkerに設定しない。サンプルtoolは読み取り専用の静的結果。
 - 関連ファイル: `src/index.ts`, `src/config.ts`, `src/ledger.ts`, `migrations/0001_purchases.sql`, `README.md`。
 - 現在のローカル変更: なし。`wrangler.testnet.jsonc`だけはGit無視のTestnet専用設定として存在。
-- 次の最小作業: GitHubリポジトリをpublic化し、無料セルフホスト版として公開する。Mainnet移行・npm公開は別承認。
+- 次の最小作業: 外部利用者の導入状況・要望を確認し、実際に詰まった箇所だけ改善する。Mainnet移行・npm公開は別承認。
 - 注意: Mainnet設定は対応するが、本番検証済みではない。
