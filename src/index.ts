@@ -42,7 +42,7 @@ export function createServer(env: Env): McpServer {
 async function paidRuleBrief(args: { topic: string }, extra: any, env: Env, config: ReturnType<typeof paymentConfig>, resourceServer: any, initialize: () => Promise<void>) {
   await initialize();
   const requirements = await resourceServer.buildPaymentRequirements({ scheme: "exact", payTo: config.recipient, price: config.priceUsd, network: config.network, maxTimeoutSeconds: 300 });
-  const token = extra?._meta?.["x402/payment"] ?? extra?.requestInfo?.headers?.["PAYMENT-SIGNATURE"];
+  const token = extra?.mcpReq?._meta?.["x402/payment"] ?? extra?._meta?.["x402/payment"] ?? extra?.requestInfo?.headers?.["PAYMENT-SIGNATURE"];
   if (typeof token !== "string") return paymentRequired(requirements);
   const fingerprint = await sha256(token);
   const inputHash = await sha256(canonicalJson(args));
