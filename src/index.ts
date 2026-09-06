@@ -4,6 +4,7 @@ import { HTTPFacilitatorClient, x402ResourceServer } from "@x402/core/server";
 import { registerExactEvmScheme } from "@x402/evm/exact/server";
 import { z } from "zod";
 import { paymentConfig } from "./config";
+import { reviewX402Config } from "./config-review";
 import { createPaidToolHandler } from "./paid-tool";
 
 export default {
@@ -15,29 +16,36 @@ export default {
 
 export function createServer(env: Env): McpServer {
   const config = paymentConfig(env);
-  const server = new McpServer({ name: "x402 MCP Starter", version: "0.1.0" });
+  const server = new McpServer({ name: "x402 MCP Starter", version: "0.2.0" });
   const resourceServer = new x402ResourceServer(new HTTPFacilitatorClient({ url: config.facilitatorUrl }));
   registerExactEvmScheme(resourceServer);
   let initialized: Promise<void> | undefined;
   const initialize = () => initialized ??= resourceServer.initialize();
 
-  server.registerTool("list_sample_options", {
-    title: "List free sample options",
-    description: "Free sample: returns a small static catalog without payment.",
-    inputSchema: z.object({}),
+  server.registerTool("validate_x402_config", {
+    title: "Validate x402 payment configuration",
+    description: "Free: checks Base USDC, price, amount, recipient, and facilitator settings before you deploy an x402-paid MCP tool.",
+    inputSchema: z.object({
+      network: z.enum(["eip155:84532", "eip155:8453"]),
+      asset: z.string(),
+      amount: z.string(),
+      priceUsd: z.number(),
+      payTo: z.string(),
+      facilitatorUrl: z.string(),
+    }),
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-  }, async () => result({ free: true, options: ["basic", "standard", "extended"] }));
+  }, async (input) => result(reviewX402Config(input)));
 
   server.registerTool("get_paid_sample", {
     title: "Get a paid sample result",
-    description: "Paid sample: returns static data after an x402 USDC payment.",
+    description: "Fixed-price reference path: confirms that an x402-aware MCP client can pay and receive a receipt.",
     inputSchema: z.object({ option: z.enum(["basic", "standard", "extended"]) }),
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }, createPaidToolHandler({
     toolName: "get_paid_sample",
-    resource: { url: "x402://get_paid_sample", description: "Get a paid sample result" },
+    resource: { url: "x402://get_paid_sample", description: "Verify a fixed-price x402 payment path" },
     env, config, resourceServer, initialize,
-    execute: ({ option }) => ({ option, summary: `Paid sample result for ${option}. Replace this handler with your own read-only data source.` }),
+    execute: ({ option }) => ({ option, summary: `x402 payment flow confirmed for ${option}. Replace this reference handler with your own read-only data source.` }),
   }));
   return server;
 }

@@ -1,11 +1,17 @@
 # x402 MCP Starter
 
-Free, self-hosted Cloudflare Workers starter for an MCP server with one free tool and one USDC-paid tool. It is intentionally small: Base Sepolia is the default; no dashboard, custody, user account, or Aegis-specific feature is included.
+Free, self-hosted Cloudflare Workers starter for adding USDC usage billing to an MCP server. It is intentionally small: no dashboard, custody, user account, or Aegis-specific feature is included.
+
+## Product and public endpoint
+
+This repository is the product: copy it, deploy it to your own Cloudflare account, and replace the reference paid handler with your own read-only service.
+
+The public endpoint at `https://x402-mcp-starter.kadopi.workers.dev/mcp` is a Base Sepolia/test-USDC verification environment. It lets an x402-aware MCP client check the configuration tool and a fixed-price payment flow. It is not a hosted production payment service and it does not custody funds.
 
 ## Included flow
 
-- `list_sample_options`: free sample catalog.
-- `get_paid_sample`: fixed-price paid sample, guarded by the official `@x402/core` and `@x402/evm` Exact EVM server APIs.
+- `validate_x402_config`: free configuration review for Base USDC, price, amount, receiving address, and facilitator URL.
+- `get_paid_sample`: fixed-price payment-flow reference, guarded by the official `@x402/core` and `@x402/evm` Exact EVM server APIs.
 - An unpaid paid-tool call returns a canonical MCP x402 error containing payment requirements. An x402-aware client signs, retries with `x402/payment`, and receives a tool result with `x402/payment-response`.
 - A D1 purchase row binds a SHA-256 fingerprint of the payment proof to the tool name and canonical input hash. Reusing it for other input is rejected. Retrying the same call returns its saved result; a `settling` record returns `payment_confirmation_pending`, never a fresh charge request.
 - Successful results are retained for 7 days. The database never stores a private key or raw payment proof.
@@ -31,14 +37,14 @@ cp .dev.vars.example .dev.vars
 npm run dev
 ```
 
-Connect an MCP client to `http://localhost:8788/mcp`. `list_sample_options` works without payment. An unpaid `get_paid_sample` returns the payment challenge. The default price is 10,000 atomic USDC units (`0.01` USDC) on `eip155:84532`; `X402_AMOUNT` must match `X402_PRICE_USD × 1,000,000`.
+Connect an MCP client to `http://localhost:8788/mcp`. Use `validate_x402_config` before deploying a paid tool. An unpaid `get_paid_sample` returns the payment challenge. The default price is 10,000 atomic USDC units (`0.01` USDC) on `eip155:84532`; `X402_AMOUNT` must match `X402_PRICE_USD × 1,000,000`.
 
 ## Testnet confirmation checklist
 
 1. Create a D1 database and apply `migrations/0001_purchases.sql` locally or to a specifically chosen non-production D1 database.
 2. Configure a Base Sepolia recipient and the facilitator URL. Keep `X402_NETWORK=eip155:84532` and the Base Sepolia USDC address.
 3. Fund only the buyer test wallet with Base Sepolia test USDC (for example, Circle's test faucet). The EIP-3009 USDC flow is gasless for the buyer.
-4. Call the free tool, then call the paid tool without proof and confirm `x402/error` / `PAYMENT_REQUIRED`.
+4. Call `validate_x402_config` with the configured network, asset, amount, price, recipient, and facilitator URL. Then call the paid tool without proof and confirm `x402/error` / `PAYMENT_REQUIRED`.
 5. Use an x402-capable MCP client with a hard per-payment limit of 10,000 atomic units. Confirm its payment requirements: `exact`, `eip155:84532`, expected USDC asset, recipient, and amount.
 6. Retry once with the returned payment proof; confirm the result and `x402/payment-response` receipt. Retry the same proof and input; confirm the saved result, not another settlement. Retry the proof with another option; confirm `payment_reuse_rejected`.
 7. For a deliberate worker/network interruption after verification, retry only the same proof and confirm `payment_confirmation_pending` or the saved receipt. Inspect the D1 row before any manual reconciliation.
@@ -55,7 +61,7 @@ set -a; source .testnet-payer.env; set +a; npm run e2e:testnet
 
 It accepts only one exact Base Sepolia USDC requirement for 10,000 atomic units, addressed to the configured recipient. Do not paste a private key into chat or commit it to `.dev.vars`.
 
-This package does not automatically create a D1 database, deploy a Worker, or make a payment. Base Mainnet is configuration-capable (`eip155:8453` and canonical USDC) but is not production-verified.
+This package does not automatically create a D1 database, deploy a Worker, or make a payment. Base Mainnet is configuration-capable (`eip155:8453` and canonical USDC) but is not production-verified. A Mainnet rollout needs a separate approval because it can process real USDC.
 
 ## Operations limits
 
@@ -65,4 +71,4 @@ This package does not automatically create a D1 database, deploy a Worker, or ma
 
 ## Japanese quick start
 
-`wrangler.jsonc` にD1 ID、`.dev.vars` に受取ウォレットを設定し、migration実行後に `npm run dev` を実行します。無料ツールを確認してから、有料ツールの未払い402→対応クライアントの署名→同じ呼び出しの再送をTestnetで1往復確認してください。Mainnet、実USDC、デプロイはそれぞれ別承認で実行します。
+`wrangler.jsonc` にD1 ID、`.dev.vars` に受取ウォレットを設定し、migration実行後に `npm run dev` を実行します。まず `validate_x402_config` で設定を確認してから、有料ツールの未払い402→対応クライアントの署名→同じ呼び出しの再送をTestnetで1往復確認してください。Mainnet、実USDC、デプロイはそれぞれ別承認で実行します。

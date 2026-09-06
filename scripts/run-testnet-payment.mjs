@@ -17,7 +17,7 @@ const expected = {
   payTo: required("X402_E2E_PAY_TO"),
 };
 
-const baseClient = new Client({ name: "x402-mcp-starter-testnet", version: "0.1.0" });
+const baseClient = new Client({ name: "x402-mcp-starter-testnet", version: "0.2.0" });
 const transport = new StreamableHTTPClientTransport(new URL(endpoint));
 
 try {

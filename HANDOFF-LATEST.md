@@ -1,8 +1,8 @@
 # 最新引き継ぎ 2026-09-06
 
 - 現在地: 無料セルフホスト版をGitHubでpublic公開済み。Cloudflare Testnetで実決済・同一証明再送も成功。
-- 直近コミット: `dfb18e0 feat: extract reusable paid tool adapter`（private `kadopi/x402-mcp-starter`へpush済み）。
-- 実装: Cloudflare Workersの`/mcp` Streamable HTTP、無料`list_sample_options`、有料`get_paid_sample`。
+- 直近コミット: `ac6fcd5 docs: record public release`（public `kadopi/x402-mcp-starter`へpush済み）。
+- 実装: 現在の公開Workerは`/mcp`の無料サンプル・有料`get_paid_sample`。ローカルではv0.2.0の無料`validate_x402_config`へ更新中。
 - 決済SDK: 公式`@x402/core`/`@x402/evm` Exact EVMサーバーAPIを薄く利用。
 - 初期設定: Base Sepolia `eip155:84532`、テストUSDC、0.01 USDC（10000 atomic）。
 - 設定検証: network/USDC asset/価格と最小単位/受取先/facilitator URLが不一致ならfail closed。
@@ -17,12 +17,12 @@
 - 確認済み: 公開URLでinitialize・無料tool・未払い`PAYMENT_REQUIRED`を確認。Base Sepolia USDC 10000 atomic、payTo=`0x6171D238FD82c293a39cEd6DF72A330532D00d76`。
 - 確認済み: 2026-09-06に購入者`0xB288...b0103`から0.01 test USDCを1回決済。D1 purchase=`dde7a94d-a15a-4aee-87ef-4f33d49a42be`は`settled`、tx=`0xf0e0...9bb79a`。
 - 確認済み: 最新の`get_paid_sample`で0.01 test USDCを1回決済し、同一証明の再送も成功。purchase=`e4b434e6-870c-4e03-8966-4d3805f15b5d`、tx=`0xcc3e...07ae`、追加決済なし。
-- 確認済み: `npm run check` 成功。`npm test` は6件成功。
+- 確認済み: 既存公開版で`npm run check`成功、`npm test`は6件成功。v0.2.0ローカル変更で`npm run check`成功、`npm test`は9件成功、`mcp-publisher validate server.json`も成功。
 - 未確認: delivery failure時の復旧。初版公開前の必須確認ではなく、将来の障害対応改善候補。
 - 未実施: npm公開、本番用の有料コンテンツ・Mainnet移行。
 - 購入者: `npm run payer:testnet:create`で専用EOAを作成。秘密鍵はGit無視の`.testnet-payer.env`だけに保存し、Worker・チャットへ渡さない。
 - 安全境界: 購入者秘密鍵はWorkerに設定しない。サンプルtoolは読み取り専用の静的結果。
 - 関連ファイル: `src/index.ts`, `src/config.ts`, `src/ledger.ts`, `migrations/0001_purchases.sql`, `README.md`。
-- 現在のローカル変更: なし。`wrangler.testnet.jsonc`だけはGit無視のTestnet専用設定として存在。
-- 次の最小作業: 外部利用者の導入状況・要望を確認し、実際に詰まった箇所だけ改善する。Mainnet移行・npm公開は別承認。
+- 現在のローカル変更: v0.2.0として正式製品の位置付けを明確化。無料`validate_x402_config`、Registry用`server.json`、README、テストを追加。未commit・未push・未deploy。
+- 次の最小作業: 統括承認後にv0.2.0をcommit/pushし、既存Base Sepolia endpointへdeployする。MCP Registry publish、Mainnet移行・npm公開は別承認。
 - 注意: Mainnet設定は対応するが、本番検証済みではない。
