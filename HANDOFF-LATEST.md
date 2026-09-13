@@ -1,5 +1,7 @@
 # 最新引き継ぎ 2026-09-06
 
+- 2026-09-13: `/.well-known/agent-card.json` にMCP Service Cardを追加。`x402`、`usdc`、`payment-preflight`、`cloudflare-workers`タグ、英語利用例、最初の`validate_x402_config`を公開する。A2Aは提供しない。
+
 - 現在地: 無料セルフホスト版をGitHubでpublic公開済み。v0.2.0のBase Sepolia公開Workerで設定確認・決済参照フローを提供。
 - 直近コミット: `d35bc57 feat: add x402 configuration review`（public `kadopi/x402-mcp-starter`へpush済み）。
 - 実装: Cloudflare Workersの`/mcp` Streamable HTTP、無料`validate_x402_config`、有料決済参照`get_paid_sample`。
