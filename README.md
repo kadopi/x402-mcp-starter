@@ -72,3 +72,12 @@ This package does not automatically create a D1 database, deploy a Worker, or ma
 ## Japanese quick start
 
 `wrangler.jsonc` にD1 ID、`.dev.vars` に受取ウォレットを設定し、migration実行後に `npm run dev` を実行します。まず `validate_x402_config` で設定を確認してから、有料ツールの未払い402→対応クライアントの署名→同じ呼び出しの再送をTestnetで1往復確認してください。Mainnet、実USDC、デプロイはそれぞれ別承認で実行します。
+
+## AI discovery links
+
+- MCP endpoint: https://x402-mcp-starter.kadopi.workers.dev/mcp
+- MCP Service Card: https://x402-mcp-starter.kadopi.workers.dev/.well-known/agent-card.json
+- Aegis product page: https://aegis-sales-bot.kadopi.workers.dev/products/x402-mcp-starter
+- GitHub README: https://github.com/kadopi/x402-mcp-starter/blob/master/README.md
+- MCP Registry search: https://registry.modelcontextprotocol.io/?q=io.github.kadopi%2Fx402-mcp-starter (registration prepared, not published)
+- ClawHub Skill source: [openclaw/SKILL.md](openclaw/SKILL.md) (publication prepared)

@@ -13,6 +13,12 @@ const AGENT_CARD = {
   version: "0.2.0",
   serviceType: "mcp-service-card",
   mcpEndpoint: "https://x402-mcp-starter.kadopi.workers.dev/mcp",
+  links: {
+    productPage: "https://aegis-sales-bot.kadopi.workers.dev/products/x402-mcp-starter",
+    githubReadme: "https://github.com/kadopi/x402-mcp-starter/blob/master/README.md",
+    mcpRegistry: "https://registry.modelcontextprotocol.io/?q=io.github.kadopi%2Fx402-mcp-starter",
+    clawHubSkillSource: "https://github.com/kadopi/x402-mcp-starter/blob/master/openclaw/SKILL.md"
+  },
   transport: "streamable-http",
   skills: [{
     id: "x402-mcp-payment-preflight",

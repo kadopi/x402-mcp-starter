@@ -1,3 +1,8 @@
+# 商品公開導線 2026-09-13（未コミット）
+- README、MCP Service Card、`openclaw/SKILL.md`を相互リンク用に追加。
+- MCP Registry manifestは既存。RegistryとClawHub Skillは未公開で、公開には別承認が必要。
+- 検証: `npm run check && npm test`、10件成功。
+
 # 最新引き継ぎ 2026-09-06
 
 - 2026-09-13: `/.well-known/agent-card.json` にMCP Service Cardを追加。`x402`、`usdc`、`payment-preflight`、`cloudflare-workers`タグ、英語利用例、最初の`validate_x402_config`を公開する。A2Aは提供しない。
