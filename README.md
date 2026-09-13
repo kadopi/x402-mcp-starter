@@ -79,5 +79,5 @@ This package does not automatically create a D1 database, deploy a Worker, or ma
 - MCP Service Card: https://x402-mcp-starter.kadopi.workers.dev/.well-known/agent-card.json
 - Aegis product page: https://aegis-sales-bot.kadopi.workers.dev/products/x402-mcp-starter
 - GitHub README: https://github.com/kadopi/x402-mcp-starter/blob/master/README.md
-- MCP Registry search: https://registry.modelcontextprotocol.io/?q=io.github.kadopi%2Fx402-mcp-starter (registration prepared, not published)
+- MCP Registry: https://registry.modelcontextprotocol.io/?q=io.github.kadopi%2Fx402-mcp-starter
 - ClawHub Skill source: [openclaw/SKILL.md](openclaw/SKILL.md) (publication prepared)
